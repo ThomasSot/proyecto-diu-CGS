@@ -139,7 +139,7 @@ export default function AgileHealthBarometer() {
                 <p>Áreas de mejora: Colaboración, Cumplimiento de objetivos</p>
             </div>
             <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-6 w-auto ml-auto block"
                 onClick={() => {
                     setCurrentScreen('evaluation')
                     setCurrentQuestion(0)
@@ -154,9 +154,9 @@ export default function AgileHealthBarometer() {
 
     const renderEvaluationScreen = () => (
         <div className="bg-white rounded-b-lg shadow-md p-6 space-y-8">
-            <h2 className="text-2xl font-bold mb-6 text-center">Evaluación de Salud del Equipo</h2>
+            <h2 className="text-2xl font-bold mb-3 text-center">Evaluación de Salud del Equipo</h2>
             {questions.map((question, index) => (
-                <div key={index} className="border-b pb-4 mb-4">
+                <div key={index} className="border-b pb-4">
                     <p className="text-gray-600 mb-4 text-lg font-semibold">
                         {index + 1}. {question.question}
                     </p>
@@ -310,7 +310,7 @@ export default function AgileHealthBarometer() {
                     <p>No hay resultados disponibles. Por favor, completa una evaluación primero.</p>
                 )}
                 <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-6 w-auto ml-auto block"
                     onClick={() => {
                         setCurrentScreen('evaluation')
                         setCurrentQuestion(0)
@@ -327,7 +327,7 @@ export default function AgileHealthBarometer() {
     return (
         <div className="container mx-auto p-4">
             <div>
-                <nav className="flex bg-blue-100 rounded-t-lg shadow-md">
+                <nav className="flex bg-blue-100 rounded-t-lg shadow-md font-bold">
                     <button
                         className={`mr-1 py-2 px-4 rounded-t-lg text-gray-800 ${currentScreen === 'main' ? 'bg-blue-400' : 'bg-blue-100 hover:bg-blue-200'} transition-all`}
                         onClick={() => setCurrentScreen('main')}
