@@ -356,7 +356,7 @@ export default function AgileHealthBarometer() {
     }, []);
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 m-4">
             <div>
                 <nav className="flex bg-blue-100 rounded-t-lg shadow-md font-bold">
                     <button
