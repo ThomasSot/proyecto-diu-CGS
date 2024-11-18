@@ -1,39 +1,39 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 const teamHealthData = {
-    '2024-05': [
+    'Mayo 2024': [
         { aspect: 'Colaboración', score: 7.2 },
         { aspect: 'Comunicación', score: 7.0 },
         { aspect: 'Adaptabilidad', score: 7.5 },
         { aspect: 'Cumplimiento de objetivos', score: 7.8 },
         { aspect: 'Ambiente de trabajo', score: 8.0 },
     ],
-    '2024-06': [
+    'Junio 2024': [
         { aspect: 'Colaboración', score: 7.5 },
         { aspect: 'Comunicación', score: 7.3 },
         { aspect: 'Adaptabilidad', score: 7.8 },
         { aspect: 'Cumplimiento de objetivos', score: 8.0 },
         { aspect: 'Ambiente de trabajo', score: 8.2 },
     ],
-    '2024-07': [
+    'Julio 2024': [
         { aspect: 'Colaboración', score: 7.6 },
         { aspect: 'Comunicación', score: 7.5 },
         { aspect: 'Adaptabilidad', score: 8.0 },
         { aspect: 'Cumplimiento de objetivos', score: 7.9 },
         { aspect: 'Ambiente de trabajo', score: 8.1 },
     ],
-    '2024-08': [
+    'Agosto 2024': [
         { aspect: 'Colaboración', score: 7.8 },
         { aspect: 'Comunicación', score: 8.0 },
         { aspect: 'Adaptabilidad', score: 8.5 },
         { aspect: 'Cumplimiento de objetivos', score: 8.2 },
         { aspect: 'Ambiente de trabajo', score: 8.5 },
     ],
-    '2024-09': [
+    'Septiembre 2024': [
         { aspect: 'Colaboración', score: 8.2 },
         { aspect: 'Comunicación', score: 8.5 },
         { aspect: 'Adaptabilidad', score: 8.7 },
@@ -75,25 +75,34 @@ const questions = [
     },
 ];
 
-
 export default function AgileHealthBarometer() {
     const [currentScreen, setCurrentScreen] = useState('main')
+    const [currentMonth, setCurrentMonth] = useState(teamHealthData[Object.keys(teamHealthData)[Object.keys(teamHealthData).length - 1]])
+    const [currentMonthName, setCurrentMonthName] = useState("")
     const [currentQuestion, setCurrentQuestion] = useState(0)
-    const [selectedMonth1, setSelectedMonth1] = useState('2024-09')
-    const [selectedMonth2, setSelectedMonth2] = useState('2024-08')
+    const [selectedMonth1, setSelectedMonth1] = useState('Septiembre 2024')
+    const [selectedMonth2, setSelectedMonth2] = useState('Agosto 2024')
     const [userResponses, setUserResponses] = useState([null, null, null, null, null])
     const [evaluationCompleted, setEvaluationCompleted] = useState(false)
+
+    const getScore = (response) => {
+        return response === "positive" ? 10 : 0;
+    };
 
     const handleEvaluationSubmission = () => {
         if (userResponses.every(response => response !== null)) {
             const currentDate = new Date();
-            const yearMonth = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
-
+            const months = [
+                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+            ];
+            const monthName = months[currentDate.getMonth()];
+            const year = currentDate.getFullYear();
+            const yearMonth = `${monthName} ${year}`;
             const evaluationResults = userResponses.map(response => ({
                 aspect: response.aspect,
-                score: response.response === 'positive' ? 10 : 0
+                score: response.response === 'positive' ? 10 : 0,
+                response: response.response
             }));
-
             if (teamHealthData[yearMonth]) {
                 teamHealthData[yearMonth] = teamHealthData[yearMonth].map(item => {
                     const result = evaluationResults.find(res => res.aspect === item.aspect);
@@ -102,7 +111,8 @@ export default function AgileHealthBarometer() {
             } else {
                 teamHealthData[yearMonth] = evaluationResults;
             }
-
+            setCurrentMonthName(yearMonth);
+            setCurrentMonth(evaluationResults);
             setEvaluationCompleted(true);
             setCurrentScreen('results');
         } else {
@@ -114,43 +124,63 @@ export default function AgileHealthBarometer() {
         }
     };
 
-    const renderMainScreen = () => (
-        <div className="bg-white rounded-b-lg shadow-md mb-8 p-6">
-            <div className="mb-4">
-                <h2 className="text-2xl font-bold">Equipo Ágil Alpha - Evaluación de Septiembre</h2>
-                <p className="text-gray-600">Resumen de la salud del equipo</p>
+    const renderMainScreen = () => {
+        console.log(currentMonth);
+        
+        const totalScore = currentMonth.reduce((sum, item) => sum + (getScore(item.response) || item.score), 0);
+        const averageScore = (totalScore / currentMonth.length).toFixed(2);
+        return (
+            <div className="bg-white rounded-b-lg shadow-md mb-8 p-6">
+                <div className="mb-4">
+                    <h2 className="text-2xl font-bold">Equipo Ágil Alpha - Evaluación de {currentMonthName}</h2>
+                    <p className="text-gray-600">Resumen de la salud del equipo</p>
+                </div>
+                <div className="h-[300px] mb-6">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={currentMonth}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="aspect" />
+                            <YAxis domain={[0, 10]} />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="score" fill="#8884d8" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+                <div className="bg-gray-100 rounded-lg p-4 mb-6">
+                    <h3 className="text-xl font-semibold mb-2">Resumen de la Evaluación Actual</h3>
+                    <p className="mb-2">Puntuación promedio: {averageScore}</p>
+                    <p className="font-semibold">Puntos fuertes:</p>
+                    <ul className="list-disc pl-5">
+                        {currentMonth
+                            .filter(item => item.response === "positive")
+                            .map((item, index) => (
+                                <li key={index}>{item.aspect}</li>
+                            ))}
+                    </ul>
+                    <p className="font-semibold mt-4">Áreas de mejora:</p>
+                    <ul className="list-disc pl-5">
+                        {currentMonth
+                            .filter(item => item.response === "negative")
+                            .map((item, index) => (
+                                <li key={index}>{item.aspect}</li>
+                            ))}
+                    </ul>
+                </div>
+                <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-6 w-auto ml-auto block"
+                    onClick={() => {
+                        setCurrentScreen('evaluation')
+                        setCurrentQuestion(0)
+                        setUserResponses([null, null, null, null, null])
+                        setEvaluationCompleted(false)
+                    }}
+                >
+                    Iniciar Nueva Evaluación
+                </button>
             </div>
-            <div className="h-[300px] mb-6">
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={teamHealthData['2024-09']}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="aspect" />
-                        <YAxis domain={[0, 10]} />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="score" fill="#8884d8" />
-                    </BarChart>
-                </ResponsiveContainer>
-            </div>
-            <div className="bg-gray-100 rounded-lg p-4 mb-6">
-                <h3 className="text-xl font-semibold mb-2">Resumen de la Evaluación Actual</h3>
-                <p>Puntuación promedio: 8.5</p>
-                <p>Puntos fuertes: Adaptabilidad, Ambiente de trabajo</p>
-                <p>Áreas de mejora: Colaboración, Cumplimiento de objetivos</p>
-            </div>
-            <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-6 w-auto ml-auto block"
-                onClick={() => {
-                    setCurrentScreen('evaluation')
-                    setCurrentQuestion(0)
-                    setUserResponses([null, null, null, null, null])
-                    setEvaluationCompleted(false)
-                }}
-            >
-                Iniciar Nueva Evaluación
-            </button>
-        </div>
-    );
+        )
+    };
 
     const renderEvaluationScreen = () => (
         <div className="bg-white rounded-b-lg shadow-md p-6 space-y-8">
@@ -323,6 +353,15 @@ export default function AgileHealthBarometer() {
             </div>
         )
     };
+
+    useEffect(() => {
+        const months = Object.keys(teamHealthData);
+        const lastMonth = months[months.length - 1];
+        const lastMonthData = teamHealthData[lastMonth];
+
+        setCurrentMonthName(lastMonth);
+        setCurrentMonth(lastMonthData);
+    }, []);
 
     return (
         <div className="container mx-auto p-4">
