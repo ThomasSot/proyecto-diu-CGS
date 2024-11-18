@@ -115,7 +115,7 @@ export default function AgileHealthBarometer() {
     };
 
     const renderMainScreen = () => (
-        <div className="bg-white rounded-lg shadow-md mb-8 p-6">
+        <div className="bg-white rounded-b-lg shadow-md mb-8 p-6">
             <div className="mb-4">
                 <h2 className="text-2xl font-bold">Equipo Ágil Alpha - Evaluación de Septiembre</h2>
                 <p className="text-gray-600">Resumen de la salud del equipo</p>
@@ -150,12 +150,10 @@ export default function AgileHealthBarometer() {
                 Iniciar Nueva Evaluación
             </button>
         </div>
-    )
-
-
+    );
 
     const renderEvaluationScreen = () => (
-        <div className="bg-white rounded-lg shadow-md p-6 space-y-8">
+        <div className="bg-white rounded-b-lg shadow-md p-6 space-y-8">
             <h2 className="text-2xl font-bold mb-6 text-center">Evaluación de Salud del Equipo</h2>
             {questions.map((question, index) => (
                 <div key={index} className="border-b pb-4 mb-4">
@@ -213,7 +211,6 @@ export default function AgileHealthBarometer() {
         </div>
     );
 
-
     const renderComparisonScreen = () => {
         const combinedData = teamHealthData[selectedMonth1].map((item, index) => ({
             aspect: item.aspect,
@@ -222,7 +219,7 @@ export default function AgileHealthBarometer() {
         }))
 
         return (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-b-lg shadow-md p-6">
                 <h2 className="text-2xl font-bold mb-4">Comparación de Evaluaciones</h2>
                 <div className="flex justify-between mb-4">
                     <select
@@ -270,7 +267,7 @@ export default function AgileHealthBarometer() {
                 </p>
             </div>
         )
-    }
+    };
 
     const renderResultsScreen = () => {
         const calculateScore = (response) => response === 'positive' ? 10 : 0
@@ -280,7 +277,7 @@ export default function AgileHealthBarometer() {
         }))
 
         return (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-b-lg shadow-md p-6">
                 <h2 className="text-2xl font-bold mb-2">Resultados de la Evaluación</h2>
                 <p className="text-gray-600 mb-4">Resumen de tu evaluación reciente</p>
                 {evaluationCompleted ? (
@@ -325,32 +322,32 @@ export default function AgileHealthBarometer() {
                 </button>
             </div>
         )
-    }
+    };
 
     return (
         <div className="container mx-auto p-4">
-            <div className="mb-4">
-                <nav className="flex">
+            <div>
+                <nav className="flex bg-blue-100 rounded-t-lg shadow-md">
                     <button
-                        className={`mr-1 py-2 px-4 rounded-t ${currentScreen === 'main' ? 'bg-white' : 'bg-gray-200'}`}
+                        className={`mr-1 py-2 px-4 rounded-t-lg text-gray-800 ${currentScreen === 'main' ? 'bg-blue-400' : 'bg-blue-100 hover:bg-blue-200'} transition-all`}
                         onClick={() => setCurrentScreen('main')}
                     >
                         Principal
                     </button>
                     <button
-                        className={`mr-1 py-2 px-4 rounded-t ${currentScreen === 'evaluation' ? 'bg-white' : 'bg-gray-200'}`}
+                        className={`mr-1 py-2 px-4 rounded-t-lg text-gray-800 ${currentScreen === 'evaluation' ? 'bg-blue-400' : 'bg-blue-100 hover:bg-blue-200'} transition-all`}
                         onClick={() => setCurrentScreen('evaluation')}
                     >
                         Evaluación
                     </button>
                     <button
-                        className={`mr-1 py-2 px-4 rounded-t ${currentScreen === 'comparison' ? 'bg-white' : 'bg-gray-200'}`}
+                        className={`mr-1 py-2 px-4 rounded-t-lg text-gray-800 ${currentScreen === 'comparison' ? 'bg-blue-400' : 'bg-blue-100 hover:bg-blue-200'} transition-all`}
                         onClick={() => setCurrentScreen('comparison')}
                     >
                         Comparación
                     </button>
                     <button
-                        className={`py-2 px-4 rounded-t ${currentScreen === 'results' ? 'bg-white' : 'bg-gray-200'}`}
+                        className={`py-2 px-4 rounded-t-lg text-gray-800 ${currentScreen === 'results' ? 'bg-blue-400' : 'bg-blue-100 hover:bg-blue-200'} transition-all`}
                         onClick={() => setCurrentScreen('results')}
                     >
                         Resultados
