@@ -150,21 +150,13 @@ export default function AgileHealthBarometer() {
                 <div className="bg-gray-100 rounded-lg p-4 mb-6">
                     <h3 className="text-xl font-semibold mb-2">Resumen de la Evaluación Actual</h3>
                     <p className="mb-2">Puntuación promedio: {averageScore}</p>
-                    <p className="font-semibold">Puntos fuertes:</p>
+                    {currentMonth.filter(item => item.response === "positive").length > 0 && <p className="font-semibold">Puntos fuertes:</p>}
                     <ul className="list-disc pl-5">
-                        {currentMonth
-                            .filter(item => item.response === "positive")
-                            .map((item, index) => (
-                                <li key={index}>{item.aspect}</li>
-                            ))}
+                        {currentMonth.filter(item => item.response === "positive").map((item, index) => (<li key={index}>{item.aspect}</li>))}
                     </ul>
-                    <p className="font-semibold mt-4">Áreas de mejora:</p>
+                    {currentMonth.filter(item => item.response === "negative").length > 0 && <p className="font-semibold mt-4">Áreas de mejora:</p>}
                     <ul className="list-disc pl-5">
-                        {currentMonth
-                            .filter(item => item.response === "negative")
-                            .map((item, index) => (
-                                <li key={index}>{item.aspect}</li>
-                            ))}
+                        {currentMonth.filter(item => item.response === "negative").map((item, index) => (<li key={index}>{item.aspect}</li>))}
                     </ul>
                 </div>
                 <button
