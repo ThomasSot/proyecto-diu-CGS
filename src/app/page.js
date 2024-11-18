@@ -275,8 +275,8 @@ export default function AgileHealthBarometer() {
     const renderResultsScreen = () => {
         const calculateScore = (response) => response === 'positive' ? 10 : 0
         const userScores = userResponses.map(response => ({
-            aspect: response.aspect,
-            score: calculateScore(response.response)
+            aspect: response?.aspect,
+            score: calculateScore(response?.response)
         }))
 
         return (
