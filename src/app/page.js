@@ -143,7 +143,7 @@ export default function AgileHealthBarometer() {
                 onClick={() => {
                     setCurrentScreen('evaluation')
                     setCurrentQuestion(0)
-                    setUserResponses([])
+                    setUserResponses([null, null, null, null, null])
                     setEvaluationCompleted(false)
                 }}
             >
@@ -314,7 +314,7 @@ export default function AgileHealthBarometer() {
                     onClick={() => {
                         setCurrentScreen('evaluation')
                         setCurrentQuestion(0)
-                        setUserResponses([])
+                        setUserResponses([null, null, null, null, null])
                         setEvaluationCompleted(false)
                     }}
                 >
