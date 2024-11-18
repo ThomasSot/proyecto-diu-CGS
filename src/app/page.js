@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from 'react'
+import Swal from 'sweetalert2'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 const teamHealthData = {
@@ -44,43 +45,74 @@ const teamHealthData = {
 const questions = [
     {
         question: "¿Cómo es la colaboración en el equipo?",
-        positive: "Colaborativa",
-        negative: "Individualista",
+        positive: "El equipo se multiplica, compartiendo perspectivas, contexto e innovaciones con otros equipos y otras partes de la organización.",
+        negative: "El trabajo se realiza individualmente. Hay poca o ninguna colaboración dentro del equipo o con otros equipos.",
         aspect: "Colaboración"
     },
     {
         question: "¿Cómo es la comunicación dentro del equipo?",
-        positive: "Abierta",
-        negative: "Cerrada",
+        positive: "La comunicación es abierta, transparente y constructiva.",
+        negative: "La comunicación es cerrada, y hay poca transparencia entre los miembros del equipo.",
         aspect: "Comunicación"
     },
     {
         question: "¿Cómo se adapta el equipo a los cambios?",
-        positive: "Flexible",
-        negative: "Rígido",
+        positive: "El equipo es flexible y busca formas de ajustarse rápidamente a los cambios o nuevos desafíos.",
+        negative: "El equipo es rígido y tiene dificultades para adaptarse a cambios o situaciones imprevistas.",
         aspect: "Adaptabilidad"
     },
     {
         question: "¿Cómo es el cumplimiento de los objetivos del sprint?",
-        positive: "Consistente",
-        negative: "Inconsistente",
+        positive: "El equipo cumple consistentemente con los objetivos planteados, alcanzando las metas definidas.",
+        negative: "El equipo no es consistente en cumplir con los objetivos del sprint, dejando tareas pendientes o mal ejecutadas.",
         aspect: "Cumplimiento de objetivos"
     },
     {
         question: "¿Cómo describirías el ambiente de trabajo en el equipo?",
-        positive: "Positivo",
-        negative: "Negativo",
+        positive: "El equipo tiene un ambiente positivo donde todos se sienten valorados, motivados y apoyados.",
+        negative: "El ambiente es negativo, y los miembros solo se centran en cumplir tareas sin interés en el equipo.",
         aspect: "Ambiente de trabajo"
     },
-]
+];
+
 
 export default function AgileHealthBarometer() {
     const [currentScreen, setCurrentScreen] = useState('main')
     const [currentQuestion, setCurrentQuestion] = useState(0)
     const [selectedMonth1, setSelectedMonth1] = useState('2024-09')
     const [selectedMonth2, setSelectedMonth2] = useState('2024-08')
-    const [userResponses, setUserResponses] = useState([])
+    const [userResponses, setUserResponses] = useState([null, null, null, null, null])
     const [evaluationCompleted, setEvaluationCompleted] = useState(false)
+
+    const handleEvaluationSubmission = () => {
+        if (userResponses.every(response => response !== null)) {
+            const currentDate = new Date();
+            const yearMonth = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+
+            const evaluationResults = userResponses.map(response => ({
+                aspect: response.aspect,
+                score: response.response === 'positive' ? 10 : 0
+            }));
+
+            if (teamHealthData[yearMonth]) {
+                teamHealthData[yearMonth] = teamHealthData[yearMonth].map(item => {
+                    const result = evaluationResults.find(res => res.aspect === item.aspect);
+                    return result ? { ...item, score: result.score } : item;
+                });
+            } else {
+                teamHealthData[yearMonth] = evaluationResults;
+            }
+
+            setEvaluationCompleted(true);
+            setCurrentScreen('results');
+        } else {
+            Swal.fire({
+                title: "Encuesta no completada",
+                text: "Por favor, responde todas las preguntas antes de continuar.",
+                icon: "warning"
+            });
+        }
+    };
 
     const renderMainScreen = () => (
         <div className="bg-white rounded-lg shadow-md mb-8 p-6">
@@ -120,45 +152,67 @@ export default function AgileHealthBarometer() {
         </div>
     )
 
-    const handleResponse = (response) => {
-        const newResponses = [...userResponses, { ...questions[currentQuestion], response }]
-        setUserResponses(newResponses)
 
-        if (currentQuestion < questions.length - 1) {
-            setCurrentQuestion(currentQuestion + 1)
-        } else {
-            setEvaluationCompleted(true)
-            setCurrentScreen('results')
-        }
-    }
 
     const renderEvaluationScreen = () => (
-        <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold mb-2">Evaluación de Salud del Equipo</h2>
-            <p className="text-gray-600 mb-4">Pregunta {currentQuestion + 1} de {questions.length}</p>
-            <p className="mb-4 text-lg">{questions[currentQuestion].question}</p>
-            <div className="flex justify-center space-x-4 mb-6">
-                <button
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-full text-lg"
-                    onClick={() => handleResponse('negative')}
-                >
-                    {questions[currentQuestion].negative}
-                </button>
-                <button
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full text-lg"
-                    onClick={() => handleResponse('positive')}
-                >
-                    {questions[currentQuestion].positive}
-                </button>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-                <div
-                    className="bg-blue-600 h-2.5 rounded-full"
-                    style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
-                ></div>
-            </div>
+        <div className="bg-white rounded-lg shadow-md p-6 space-y-8">
+            <h2 className="text-2xl font-bold mb-6 text-center">Evaluación de Salud del Equipo</h2>
+            {questions.map((question, index) => (
+                <div key={index} className="border-b pb-4 mb-4">
+                    <p className="text-gray-600 mb-4 text-lg font-semibold">
+                        {index + 1}. {question.question}
+                    </p>
+                    <div className="flex justify-between space-x-4">
+                        <button
+                            className={`text-left ${userResponses[index]?.response === 'negative'
+                                ? 'border-4 border-red-600 bg-red-100'
+                                : 'border border-gray-300 bg-gray-100 hover:bg-gray-200'
+                                } text-gray-700 font-medium py-4 px-6 rounded-lg text-lg w-full shadow-md transition-all`}
+                            onClick={() =>
+                                setUserResponses((prev) => {
+                                    const newResponses = [...prev];
+                                    if (newResponses[index]?.response === 'negative') {
+                                        newResponses[index] = null;
+                                    } else {
+                                        newResponses[index] = { ...question, response: 'negative' };
+                                    }
+                                    return newResponses;
+                                })
+                            }
+                        >
+                            {question.negative}
+                        </button>
+                        <button
+                            className={`text-left ${userResponses[index]?.response === 'positive'
+                                ? 'border-4 border-green-600 bg-green-100'
+                                : 'border border-gray-300 bg-gray-100 hover:bg-gray-200'
+                                } text-gray-700 font-medium py-4 px-6 rounded-lg text-lg w-full shadow-md transition-all`}
+                            onClick={() =>
+                                setUserResponses((prev) => {
+                                    const newResponses = [...prev];
+                                    if (newResponses[index]?.response === 'positive') {
+                                        newResponses[index] = null;
+                                    } else {
+                                        newResponses[index] = { ...question, response: 'positive' };
+                                    }
+                                    return newResponses;
+                                })
+                            }
+                        >
+                            {question.positive}
+                        </button>
+                    </div>
+                </div>
+            ))}
+            <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-6 w-full"
+                onClick={handleEvaluationSubmission}
+            >
+                Enviar Evaluación
+            </button>
         </div>
-    )
+    );
+    
 
     const renderComparisonScreen = () => {
         const combinedData = teamHealthData[selectedMonth1].map((item, index) => ({
@@ -209,7 +263,7 @@ export default function AgileHealthBarometer() {
                     {combinedData.every(item => item[selectedMonth1] >= item[selectedMonth2])
                         ? " una mejora en todos los aspectos."
                         : " cambios variados en los diferentes aspectos."}
-                    {" "}Los cambios más notables son en
+                    {" "}Los cambios más notables son en{" "}
                     {combinedData.reduce((max, item) =>
                         Math.abs(item[selectedMonth1] - item[selectedMonth2]) > Math.abs(max[selectedMonth1] - max[selectedMonth2]) ? item : max
                     ).aspect.toLowerCase()}.
